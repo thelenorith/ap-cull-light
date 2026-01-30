@@ -6,6 +6,14 @@ A simple tool for culling astrophotography light frames based on HFR and RMS thr
 
 This tool evaluates light frames against HFR and RMS thresholds and moves rejected images to a reject directory while preserving the relative directory structure.
 
+## Documentation
+
+This tool is part of the astrophotography pipeline. For comprehensive documentation including workflow guides and integration with other tools, see:
+
+- **[Pipeline Overview](https://github.com/jewzaam/ap-base/blob/main/docs/index.md)** - Full pipeline documentation
+- **[Workflow Guide](https://github.com/jewzaam/ap-base/blob/main/docs/workflow.md)** - Detailed workflow with diagrams
+- **[ap-common Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-common.md)** - API reference for this tool
+
 ## Features
 
 - **Simple Threshold Checks**: Reject images based on HFR and RMS thresholds

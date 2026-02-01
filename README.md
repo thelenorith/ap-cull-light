@@ -1,4 +1,4 @@
-# ap-cull-lights
+# ap-cull-light
 
 [![Test](https://github.com/jewzaam/ap-cull-light/actions/workflows/test.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/test.yml)
 [![Coverage](https://github.com/jewzaam/ap-cull-light/actions/workflows/coverage.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/coverage.yml)
@@ -34,13 +34,13 @@ This tool is part of the astrophotography pipeline. For comprehensive documentat
 ### Basic Culling
 
 ```powershell
-python -m ap_cull_lights.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0
+python -m ap_cull_light.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0
 ```
 
 ### With Auto-Accept Threshold
 
 ```powershell
-python -m ap_cull_lights.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 --auto-accept-percent 5.0
+python -m ap_cull_light.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 --auto-accept-percent 5.0
 ```
 
 This will automatically accept rejections if less than 5% of images in a directory group are rejected.
@@ -48,13 +48,13 @@ This will automatically accept rejections if less than 5% of images in a directo
 ### Dry Run
 
 ```powershell
-python -m ap_cull_lights.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 --dryrun
+python -m ap_cull_light.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 --dryrun
 ```
 
 ### Debug Mode
 
 ```powershell
-python -m ap_cull_lights.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 --debug
+python -m ap_cull_light.cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 --debug
 ```
 
 ## Options
@@ -82,7 +82,7 @@ This installs the package in editable mode along with all dependencies (includin
 ### From Git Repository (One-liner)
 
 ```powershell
-pip install git+https://github.com/jewzaam/ap-cull-lights.git
+pip install git+https://github.com/jewzaam/ap-cull-light.git
 ```
 
 This installs the package directly from the GitHub repository without requiring a local checkout.
@@ -112,13 +112,13 @@ make uninstall
 ### Basic Culling
 
 ```powershell
-python -m ap_cull_lights.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0
+python -m ap_cull_light.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0
 ```
 
 ### With Auto-Accept
 
 ```powershell
-python -m ap_cull_lights.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --auto-accept-percent 3.0
+python -m ap_cull_light.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --auto-accept-percent 3.0
 ```
 
 This will automatically accept rejections if less than 3% of images are rejected in a directory group.
@@ -126,7 +126,7 @@ This will automatically accept rejections if less than 3% of images are rejected
 ### Skipping Files with Regex
 
 ```powershell
-python -m ap_cull_lights.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --skip-regex "accept|processed"
+python -m ap_cull_light.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --skip-regex "accept|processed"
 ```
 
 This will skip any files whose path contains "accept" or "processed" (case-sensitive regex matching).
@@ -134,7 +134,7 @@ This will skip any files whose path contains "accept" or "processed" (case-sensi
 ### Dry Run to Test Rules
 
 ```powershell
-python -m ap_cull_lights.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --dryrun
+python -m ap_cull_light.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --dryrun
 ```
 
 ## License

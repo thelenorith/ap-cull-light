@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import ap_common
+from ap_common.logging_config import setup_logging
 from . import config
 
 # Configure logging
@@ -319,11 +320,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # Configure logging
-    log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(
-        level=log_level,
-        format="%(levelname)s: %(message)s",
-    )
+    setup_logging(name="ap_cull_light", debug=args.debug, quiet=args.quiet)
 
     # Validate at least one threshold is specified
     if args.max_hfr is None and args.max_rms is None:

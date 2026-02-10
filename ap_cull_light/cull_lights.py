@@ -9,10 +9,11 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import ap_common
 from ap_common.logging_config import setup_logging
+from ap_common.progress import progress_iter
 from . import config
 
 # Configure logging
@@ -68,9 +69,7 @@ def reject_image(
         )
 
     if dryrun:
-        if debug:
-            logger.debug(f"  [DRYRUN] Would move: {filepath} -> {dest_path}")
-        print(f"REJECTED: {relative_path}")
+        logger.debug(f"[DRYRUN] Would reject: {relative_path}")
     else:
         try:
             # Create destination directory
@@ -80,16 +79,14 @@ def reject_image(
             ap_common.move_file(
                 from_file=str(filepath), to_file=str(dest_path), debug=debug
             )
-            print(f"REJECTED: {relative_path}")
+            logger.debug(f"Rejected: {relative_path}")
         except OSError as e:
             error_msg = f"Failed to move file {relative_path}: {e}"
             logger.error(error_msg)
-            print(f"ERROR: {error_msg}")
             raise
         except Exception as e:
             error_msg = f"Unexpected error moving file {relative_path}: {e}"
             logger.error(error_msg, exc_info=debug)
-            print(f"ERROR: {error_msg}")
             raise
 
 
@@ -118,6 +115,19 @@ def cull_lights(
         dryrun: Perform dry run without actually moving files
         quiet: Suppress progress output
     """
+    # Print operation summary upfront
+    thresholds = []
+    if max_hfr is not None:
+        thresholds.append(f"HFR<={max_hfr}")
+    if max_rms is not None:
+        thresholds.append(f"RMS<={max_rms} arcsec")
+
+    print(f"Culling lights from: {source_dir}")
+    print(f"Thresholds: {', '.join(thresholds)}")
+    if dryrun:
+        print("Mode: DRY RUN (no files will be moved)")
+    print()
+
     # Get metadata for all FITS files
     required_properties: list[str] = (
         []
@@ -157,15 +167,15 @@ def cull_lights(
         for dir_path, files in data_groups.items():
             logger.debug(f"  {dir_path}: {len(files)} files")
 
-    # Process each directory group
-    overall_count_reject = 0
-    overall_count_total = 0
+    # Evaluate rejections for all directory groups with progress
+    rejection_decisions: List[Tuple[str, List[Tuple[str, List[str]]], int, int]] = []
+    overall_count_total = sum(len(files) for files in data_groups.values())
 
-    for directory, file_metadata_list in data_groups.items():
+    for directory, file_metadata_list in progress_iter(
+        data_groups.items(), desc="Evaluating files", unit="dirs", enabled=not quiet
+    ):
         count_reject = 0
         count_total = len(file_metadata_list)
-        overall_count_total += count_total
-
         rejected_files = []
 
         # Evaluate thresholds for each file
@@ -217,55 +227,115 @@ def cull_lights(
                     continue
                 rejected_files.append((filename, reasons))
 
-        # Prompt for confirmation if there are rejections
+        # Store rejection decision for later processing
         if count_reject > 0:
-            print("=" * 60)
-            dir_short = directory.replace(source_dir, "").lstrip(os.sep)
-            print(f"Reject for '{dir_short}':")
-            for filename, reasons in rejected_files:
-                print(f"  {Path(filename).name}:")
-                for reason in reasons:
-                    print(f"    - {reason}")
-
-            rejection_percent = 100 * count_reject / count_total
-            question = (
-                f"OK to reject {count_reject}/{count_total} "
-                f"({rejection_percent:.1f}%)? (y/N)"
+            rejection_decisions.append(
+                (directory, rejected_files, count_reject, count_total)
             )
 
-            if auto_yes_percent >= 0 and rejection_percent < auto_yes_percent:
-                # Auto-accept if below threshold
-                print(f"{question} y (automatic, < {auto_yes_percent}%)")
-                answer = "y"
-            elif dryrun:
-                # Auto-accept in dryrun mode
-                print(f"{question} y (dryrun)")
-                answer = "y"
-            else:
-                answer = input(question).strip().lower()
+    # Process rejection decisions with user confirmation
+    overall_count_reject = 0
+    files_to_reject: List[str] = []
+    rejection_summary: List[Tuple[str, int, int, float]] = []
 
-            if answer == "y":
-                overall_count_reject += count_reject
-                for filename, reasons in rejected_files:
-                    reject_image(
-                        filepath=filename,
-                        reject_dir=reject_dir,
-                        source_dir=source_dir,
-                        dryrun=dryrun,
-                        debug=debug,
-                    )
-            else:
-                print("Skipping rejection for this directory group")
-            print("=" * 60)
+    for directory, rejected_files, count_reject, count_total in rejection_decisions:
+        dir_short = directory.replace(source_dir, "").lstrip(os.sep)
+        rejection_percent = 100 * count_reject / count_total
 
-    # Print summary
-    if overall_count_total > 0:
-        overall_percent = 100 * overall_count_reject / overall_count_total
-        print(
-            f"\nTotal Rejected: {overall_count_reject} of {overall_count_total} "
-            f"({overall_percent:.1f}%)"
+        # Determine if we should auto-accept
+        if auto_yes_percent >= 0 and rejection_percent < auto_yes_percent:
+            answer = "y"
+        elif dryrun:
+            answer = "y"
+        else:
+            # Prompt user
+            question = (
+                f"Reject {count_reject}/{count_total} ({rejection_percent:.1f}%) "
+                f"from '{dir_short}'? (y/N) "
+            )
+            answer = input(question).strip().lower()
+
+        if answer == "y":
+            overall_count_reject += count_reject
+            files_to_reject.extend([filename for filename, _ in rejected_files])
+            rejection_summary.append(
+                (dir_short, count_reject, count_total, rejection_percent)
+            )
+        else:
+            logger.info(f"Skipped rejection for {dir_short}")
+
+    # Move rejected files with progress
+    if files_to_reject:
+        for filepath in progress_iter(
+            files_to_reject, desc="Rejecting files", unit="files", enabled=not quiet
+        ):
+            reject_image(
+                filepath=filepath,
+                reject_dir=reject_dir,
+                source_dir=source_dir,
+                dryrun=dryrun,
+                debug=debug,
+            )
+
+    # Print formatted summary table
+    if rejection_summary:
+        print("\n" + "=" * 80)
+        print("REJECTION SUMMARY")
+        print("=" * 80)
+
+        # Table header
+        print(f"{'Target/Filter':<50} {'Rejected':>12} {'%':>8}")
+        print("-" * 80)
+
+        # Parse and group by target/filter
+        grouped_summary: Dict[str, Tuple[int, int]] = {}
+        for dir_short, count_reject, count_total, _ in rejection_summary:
+            # Extract meaningful parts from path
+            # Format: Target\DATE_xxx\FILTER_x_EXP_x_SETTEMP_x
+            parts = dir_short.split(os.sep)
+            if len(parts) >= 3:
+                target = parts[0]
+                filter_part = parts[2] if len(parts) > 2 else "unknown"
+                # Extract just the filter name (FILTER_X)
+                filter_match = re.search(r"FILTER_([^_]+)", filter_part)
+                filter_name = filter_match.group(1) if filter_match else "unknown"
+                key = f"{target} / {filter_name}"
+            else:
+                key = dir_short
+
+            if key not in grouped_summary:
+                grouped_summary[key] = (0, 0)
+            current_reject, current_total = grouped_summary[key]
+            grouped_summary[key] = (
+                current_reject + count_reject,
+                current_total + count_total,
+            )
+
+        # Print grouped rows
+        for key in sorted(grouped_summary.keys()):
+            count_reject, count_total = grouped_summary[key]
+            rejection_percent = (
+                100 * count_reject / count_total if count_total > 0 else 0
+            )
+            print(
+                f"{key:<50} {count_reject:>5}/{count_total:<5} {rejection_percent:>7.1f}%"
+            )
+
+        # Print total row
+        print("-" * 80)
+        overall_percent = (
+            100 * overall_count_reject / overall_count_total
+            if overall_count_total > 0
+            else 0
         )
-    print(f"Done with {source_dir}")
+        print(
+            f"{'TOTAL':<50} {overall_count_reject:>5}/{overall_count_total:<5} {overall_percent:>7.1f}%"
+        )
+        print("=" * 80)
+    elif overall_count_total > 0:
+        print(f"\nNo files rejected (0 of {overall_count_total})")
+
+    print(f"\nDone with: {source_dir}")
 
 
 def main() -> None:

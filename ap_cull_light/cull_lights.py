@@ -13,11 +13,14 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import ap_common
 from ap_common.logging_config import setup_logging
-from ap_common.progress import progress_iter
+from ap_common.progress import progress_iter, ProgressTracker
 from . import config
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# Set default description width for aligned progress bars
+ProgressTracker.set_default_desc_width(20)
 
 
 def reject_image(

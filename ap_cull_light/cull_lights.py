@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import ap_common
+from ap_common import NORMALIZED_HEADER_HFR, NORMALIZED_HEADER_RMSAC, TYPE_LIGHT
 from ap_common.logging_config import setup_logging
 from ap_common.progress import progress_iter, ProgressTracker
 from . import config
@@ -140,7 +141,7 @@ def cull_lights(
         patterns=[config.INPUT_PATTERN_ALL],
         recursive=True,
         required_properties=required_properties,
-        filters={"type": "LIGHT"},
+        filters={"type": TYPE_LIGHT},
         debug=debug,
         profileFromPath=True,
         printStatus=not quiet,
@@ -188,7 +189,7 @@ def cull_lights(
 
             # Check HFR threshold
             if max_hfr is not None:
-                hfr_value = metadata.get("hfr")
+                hfr_value = metadata.get(NORMALIZED_HEADER_HFR)
                 if hfr_value is not None:
                     try:
                         hfr_float = float(hfr_value)
@@ -205,7 +206,7 @@ def cull_lights(
 
             # Check RMS threshold
             if max_rms is not None:
-                rms_value = metadata.get("rmsac")
+                rms_value = metadata.get(NORMALIZED_HEADER_RMSAC)
                 if rms_value is not None:
                     try:
                         rms_float = float(rms_value)

@@ -118,8 +118,10 @@ def cull_lights(
         reject_dir: Directory to move rejected images to
         max_hfr: Maximum HFR value (reject if HFR > max_hfr)
         max_rms: Maximum RMS in arcsec (reject if RMS > max_rms)
-        auto_yes_percent: Auto-accept if rejection percentage is below this (0.0-100.0, default: -1 = prompt always)
-        skip_pattern: Compiled regex pattern - files matching the pattern will be skipped
+        auto_yes_percent: Auto-accept if rejection percentage is below this
+            (0.0-100.0, default: -1 = prompt always)
+        skip_pattern: Compiled regex pattern - files matching the pattern
+            will be skipped
         debug: Enable debug output
         dryrun: Perform dry run without actually moving files
         quiet: Suppress progress output
@@ -327,7 +329,9 @@ def cull_lights(
                 100 * count_reject / count_total if count_total > 0 else 0
             )
             print(
-                f"{key:<50} {count_reject:>5}/{count_total:<5} {rejection_percent:>7.1f}%"
+                f"{key:<50} "
+                f"{count_reject:>5}/{count_total:<5} "
+                f"{rejection_percent:>7.1f}%"
             )
 
         # Print total row
@@ -338,7 +342,9 @@ def cull_lights(
             else 0
         )
         print(
-            f"{'TOTAL':<50} {overall_count_reject:>5}/{overall_count_total:<5} {overall_percent:>7.1f}%"
+            f"{'TOTAL':<50} "
+            f"{overall_count_reject:>5}/{overall_count_total:<5} "
+            f"{overall_percent:>7.1f}%"
         )
         print("=" * 80)
     elif overall_count_total > 0:
@@ -379,13 +385,20 @@ def main() -> None:
         "--auto-accept-percent",
         type=float,
         default=-1,
-        help="Auto-accept if rejection percentage is below this (0.0-100.0, default: -1 = always prompt)",
+        help=(
+            "Auto-accept if rejection percentage is below this"
+            " (0.0-100.0, default: -1 = always prompt)"
+        ),
     )
     parser.add_argument(
         "--skip-regex",
         type=str,
         default=None,
-        help="Regex pattern to skip files/directories (e.g., 'accept' or 'accept|processed' to skip multiple patterns)",
+        help=(
+            "Regex pattern to skip files/directories"
+            " (e.g., 'accept' or 'accept|processed'"
+            " to skip multiple patterns)"
+        ),
     )
 
     parser.add_argument("--debug", action="store_true", help="Enable debug output")
@@ -409,7 +422,8 @@ def main() -> None:
     if args.auto_accept_percent != -1:
         if args.auto_accept_percent < 0.0 or args.auto_accept_percent > 100.0:
             parser.error(
-                f"--auto-accept-percent must be between 0.0 and 100.0 (got {args.auto_accept_percent})"
+                f"--auto-accept-percent must be between 0.0 and 100.0"
+                f" (got {args.auto_accept_percent})"
             )
 
     # Compile skip pattern

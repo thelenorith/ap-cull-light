@@ -8,6 +8,7 @@ import argparse
 import logging
 import os
 import re
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -16,6 +17,10 @@ from ap_common import NORMALIZED_HEADER_HFR, NORMALIZED_HEADER_RMSAC, TYPE_LIGHT
 from ap_common.logging_config import setup_logging
 from ap_common.progress import progress_iter, ProgressTracker
 from . import config
+
+# Exit code constants
+EXIT_SUCCESS = 0
+EXIT_ERROR = 1
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -443,6 +448,8 @@ def main() -> None:
         dryrun=args.dryrun,
         quiet=args.quiet,
     )
+
+    sys.exit(EXIT_SUCCESS)
 
 
 if __name__ == "__main__":

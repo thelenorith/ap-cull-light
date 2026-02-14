@@ -720,7 +720,9 @@ class TestMain:
             "sys.argv",
             ["cull_lights.py", source_dir, reject_dir, "--max-hfr", "2.5"],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         mock_cull.assert_called_once()
         call_kwargs = mock_cull.call_args[1]
@@ -740,7 +742,9 @@ class TestMain:
             "sys.argv",
             ["cull_lights.py", source_dir, reject_dir, "--max-rms", "2.0"],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["max_hfr"] is None
@@ -765,7 +769,9 @@ class TestMain:
                 "2.0",
             ],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["max_hfr"] == 2.5
@@ -782,7 +788,9 @@ class TestMain:
             "sys.argv",
             ["cull_lights.py", source_dir, reject_dir, "--max-hfr", "2.5", "--debug"],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["debug"] is True
@@ -798,7 +806,9 @@ class TestMain:
             "sys.argv",
             ["cull_lights.py", source_dir, reject_dir, "--max-hfr", "2.5", "--dryrun"],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["dryrun"] is True
@@ -832,7 +842,9 @@ class TestMain:
                 "accept",
             ],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["skip_pattern"] is not None
@@ -857,7 +869,9 @@ class TestMain:
                 "5.0",
             ],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["auto_yes_percent"] == 5.0
@@ -952,7 +966,9 @@ class TestMain:
             "sys.argv",
             ["cull_lights.py", source_dir, reject_dir, "--max-hfr", "2.5", "--quiet"],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["quiet"] is True
@@ -968,7 +984,9 @@ class TestMain:
             "sys.argv",
             ["cull_lights.py", source_dir, reject_dir, "--max-hfr", "2.5", "-q"],
         ):
-            cull_lights.main()
+            with pytest.raises(SystemExit) as exc_info:
+                cull_lights.main()
+            assert exc_info.value.code == 0
 
         call_kwargs = mock_cull.call_args[1]
         assert call_kwargs["quiet"] is True

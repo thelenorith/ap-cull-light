@@ -1,12 +1,7 @@
 # ap-cull-light
 
-[![Test](https://github.com/jewzaam/ap-cull-light/actions/workflows/test.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/test.yml)
-[![Coverage](https://github.com/jewzaam/ap-cull-light/actions/workflows/coverage.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/coverage.yml)
-[![Lint](https://github.com/jewzaam/ap-cull-light/actions/workflows/lint.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/lint.yml)
-[![Format](https://github.com/jewzaam/ap-cull-light/actions/workflows/format.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/format.yml)
-[![Typecheck](https://github.com/jewzaam/ap-cull-light/actions/workflows/typecheck.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/typecheck.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Test](https://github.com/jewzaam/ap-cull-light/actions/workflows/test.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/test.yml) [![Coverage](https://github.com/jewzaam/ap-cull-light/actions/workflows/coverage.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/coverage.yml) [![Lint](https://github.com/jewzaam/ap-cull-light/actions/workflows/lint.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/lint.yml) [![Format](https://github.com/jewzaam/ap-cull-light/actions/workflows/format.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/format.yml) [![Type Check](https://github.com/jewzaam/ap-cull-light/actions/workflows/typecheck.yml/badge.svg)](https://github.com/jewzaam/ap-cull-light/actions/workflows/typecheck.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A simple tool for culling astrophotography light frames based on HFR and RMS thresholds.
 
@@ -137,7 +132,3 @@ This will skip any files whose path contains "accept" or "processed" (case-sensi
 ```powershell
 python -m ap_cull_light.cull_lights D:\Astrophotography\Data D:\Astrophotography\Reject --max-hfr 2.5 --max-rms 2.0 --dryrun
 ```
-
-## License
-
-Apache-2.0

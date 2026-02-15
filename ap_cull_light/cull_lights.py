@@ -13,7 +13,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import ap_common
-from ap_common import NORMALIZED_HEADER_HFR, NORMALIZED_HEADER_RMSAC, TYPE_LIGHT
+from ap_common import (
+    NORMALIZED_HEADER_FILENAME,
+    NORMALIZED_HEADER_HFR,
+    NORMALIZED_HEADER_RMSAC,
+    TYPE_LIGHT,
+)
 from ap_common.logging_config import setup_logging
 from ap_common.progress import progress_iter, ProgressTracker
 from . import config
@@ -205,7 +210,9 @@ def cull_lights(
                             reasons.append(f"HFR={hfr_float} > {max_hfr}")
                     except (ValueError, TypeError):
                         if debug:
-                            filename_for_log = metadata.get("filename", "unknown")
+                            filename_for_log = metadata.get(
+                                NORMALIZED_HEADER_FILENAME, "unknown"
+                            )
                             logger.warning(
                                 f"Skipping HFR check for {filename_for_log}: "
                                 f"non-numeric HFR value '{hfr_value}'"
@@ -222,7 +229,9 @@ def cull_lights(
                             reasons.append(f"RMS={rms_float} > {max_rms} arcsec")
                     except (ValueError, TypeError):
                         if debug:
-                            filename_for_log = metadata.get("filename", "unknown")
+                            filename_for_log = metadata.get(
+                                NORMALIZED_HEADER_FILENAME, "unknown"
+                            )
                             logger.warning(
                                 f"Skipping RMS check for {filename_for_log}: "
                                 f"non-numeric RMS value '{rms_value}'"
@@ -230,7 +239,7 @@ def cull_lights(
 
             if should_reject:
                 count_reject += 1
-                filename = metadata.get("filename")
+                filename = metadata.get(NORMALIZED_HEADER_FILENAME)
                 if filename is None:
                     logger.warning(
                         "Metadata missing 'filename' field, skipping rejection"
